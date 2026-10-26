@@ -1,0 +1,145 @@
+name: Verify
+
+# Reusable: ci.yml (pull requests and master) and release.yml (release tags) run exactly these checks. Each step is one
+# step of scripts/verify.sh, the script a developer runs locally, so CI, releases and local runs verify the SDK the
+# same way.
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit to verify (empty = the caller's commit)
+        type: string
+        required: false
+        default: ''
+      api_baselines:
+        description: Stable release tags, space-separated, whose public API this commit must keep (release.yml sets them)
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  ios-sdk:
+    name: iOS SDK
+    # GitHub's macOS 26 image (arm64), which carries several Xcode 26 versions; the first step picks the newest.
+    runs-on: macos-26
+    timeout-minutes: 120
+    env:
+      SWIFTLINT_VERSION: 0.63.2
+      SWIFTLINT_BUNDLE_URL: https://github.com/realm/SwiftLint/releases/download/0.63.2/SwiftLintBinary.artifactbundle.zip
+      # GitHub's digest of that release asset, which is also the binary-target checksum in SwiftLint's Package.swift at
+      # tag 0.63.2. The release is not immutable, so this pin is its only protection. Re-confirm it with:
+      #   gh api repos/realm/SwiftLint/releases/tags/0.63.2 --jq '.assets[] | select(.name == "SwiftLintBinary.artifactbundle.zip") | .digest'
+      SWIFTLINT_BUNDLE_SHA256: 12befab676fc972ffde2ec295d016d53c3a85f64aabd9c7fee0032d681e307e9
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          # The API comparison reads the baseline releases from the history.
+          fetch-depth: ${{ inputs.api_baselines == '' && 1 || 0 }}
+          persist-credentials: false
+
+      # DEVELOPER_DIR instead of `sudo xcode-select`: no privilege needed, and every later step inherits it. Outputs
+      # are captured before matching: under pipefail, `cmd | grep -q` fails when grep stops early. The xcodebuild steps
+      # build under the job's temporary directory, never in a DerivedData that a reused runner keeps.
+      - name: Select the newest Xcode 26
+        run: |
+          set -euo pipefail
+          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_26.*.app' | grep -E '/Xcode_26\.[0-9]+(\.[0-9]+)?\.app$' | sort -V | tail -n 1 || true)"
+          if [ -z "$xcode" ]; then
+            default_version="$(DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -version 2>/dev/null || true)"
+            case "$default_version" in "Xcode 26."*) xcode=/Applications/Xcode.app ;; esac
+          fi
+          [ -n "$xcode" ] || { echo "::error::no Xcode 26.x is installed on this runner"; exit 1; }
+          echo "DEVELOPER_DIR=$xcode/Contents/Developer" >> "$GITHUB_ENV"
+          echo "VERIFY_DERIVED_DATA=$RUNNER_TEMP/DerivedData" >> "$GITHUB_ENV"
+          DEVELOPER_DIR="$xcode/Contents/Developer" xcodebuild -version
+
+      # Mandatory and pinned: CI fails when the bundle is missing or its checksum differs.
+      - name: Install SwiftLint ${{ env.SWIFTLINT_VERSION }} (pinned bundle)
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 3 -o swiftlint.zip "$SWIFTLINT_BUNDLE_URL"
+          echo "$SWIFTLINT_BUNDLE_SHA256  swiftlint.zip" | shasum -a 256 -c -
+          rm -rf swiftlint && mkdir swiftlint && unzip -q swiftlint.zip -d swiftlint
+          bundle="$(find "$PWD/swiftlint" -maxdepth 2 -name '*.artifactbundle' -type d | sed -n 1p)"
+          [ -n "$bundle" ] || { echo "::error::the SwiftLint zip holds no .artifactbundle"; exit 1; }
+          # The executable's path comes from the bundle's manifest. The helper is a file, not a heredoc inside $(...),
+          # which macOS's bash 3.2 can mis-parse.
+          cat > find-swiftlint.py <<'PY'
+          import json, platform, sys
+          bundle = sys.argv[1]
+          triple = ("arm64" if platform.machine() == "arm64" else "x86_64") + "-apple-macosx"
+          info = json.load(open(f"{bundle}/info.json"))
+          for artifact in info["artifacts"].values():
+              for variant in artifact.get("variants", []):
+                  if artifact.get("type") == "executable" and triple in variant.get("supportedTriples", []):
+                      print(f"{bundle}/{variant['path']}")
+                      sys.exit(0)
+          sys.exit(f"no {triple} swiftlint in {bundle}/info.json")
+          PY
+          binary="$(python3 find-swiftlint.py "$bundle")"
+          [ "$("$binary" version)" = "$SWIFTLINT_VERSION" ] || { echo "::error::the bundle is not SwiftLint $SWIFTLINT_VERSION"; exit 1; }
+          echo "SWIFTLINT=$binary" >> "$GITHUB_ENV"
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          "$SWIFTLINT" version
+
+      - name: SwiftLint (strict)
+        run: scripts/verify.sh lint
+      - name: Crash-safety, required-reason, Bundle.module and design-note gates
+        run: scripts/verify.sh gates
+      - name: No package dependencies
+        run: scripts/verify.sh deps
+      - name: Public API matches API.txt
+        run: scripts/verify.sh api
+      - name: Declared version and its CHANGELOG entry
+        run: scripts/verify.sh version
+      - name: Golden payloads are the wire contract's
+        run: scripts/verify.sh goldens
+      - name: Log codes are the shared log catalogue's
+        run: scripts/verify.sh catalogue
+      - name: Markdown links resolve inside the repository
+        run: scripts/verify.sh links
+      - name: What a commit takes (no secret, build output or link; required files; pinned actions)
+        run: scripts/verify.sh tree
+      - name: swift build
+        run: scripts/verify.sh build
+      - name: swift test
+        run: scripts/verify.sh test
+      - name: swift test (Thread Sanitizer)
+        run: scripts/verify.sh tsan
+      - name: xcodebuild test on the newest iPhone simulator
+        run: scripts/verify.sh xcode-test
+      - name: xcodebuild test (Thread Sanitizer)
+        run: scripts/verify.sh xcode-tsan
+      - name: SallaPushExtension builds extension-safe
+        run: scripts/verify.sh extension
+      - name: Example app, NSE and ObjC smoke build
+        run: scripts/verify.sh example
+      - name: README snippets match the example (with the checker's self-test)
+        run: scripts/verify.sh snippets
+      # Fails when the SDK adds more than 5 MB (5,242,880 bytes) to an app, which is also size-report.sh's default
+      # budget; the report prints the exact size every run.
+      - name: Size gate (fails above 5 MB, 5,242,880 bytes)
+        run: scripts/verify.sh size
+      # Every earlier stable release of the major version: SwiftPM installs every pushed tag, one whose release run
+      # failed included (scripts/release-plan.sh).
+      - name: No API break since ${{ inputs.api_baselines }}
+        if: inputs.api_baselines != ''
+        env:
+          API_BASELINES: ${{ inputs.api_baselines }}
+        run: |
+          set -euo pipefail
+          read -r -a tags <<<"$API_BASELINES"
+          refs=()
+          for tag in "${tags[@]}"; do
+            refs+=("refs/tags/$tag")
+          done
+          scripts/api-compat.sh "${refs[@]}" HEAD

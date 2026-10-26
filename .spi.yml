@@ -1,0 +1,6 @@
+# Swift Package Index: build the documentation of both libraries for iOS.
+version: 1
+builder:
+  configs:
+    - platform: ios
+      documentation_targets: [SallaPush, SallaPushExtension]

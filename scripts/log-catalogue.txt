@@ -1,0 +1,108 @@
+# The SallaPush log catalogue: every log code of the native SDKs, with the level and the category it is always logged
+# at, and the SDKs that log it. Codes are stable API: apps match on them in their log handlers.
+#
+# The Android SDK (SallaApp/mobile-push-android-sdk) and this SDK share this catalogue: each repository holds a copy
+# with the same code lines.
+# scripts/check-log-catalogue.sh checks this SDK on every pull request (scripts/verify.sh catalogue): the codes of
+# Sources/SallaPushCore/Logging/Logger.swift, with their levels and categories, are exactly the lines below for "both"
+# and "ios". To add a code, or to change a code's level, category or platform, change Logger.swift, the catalogue of
+# Tests/SallaPushTests/LogCatalogTests.swift and this file in one pull request, then the same line in the shared
+# catalogue and, for a code of both SDKs, in the Android SDK (CONTRIBUTING.md, "What needs care").
+#
+# Columns: code, level (error warn info debug verbose), platform (both ios android), category (lifecycle registration
+# identity notifications events tags network storage consent extension). The category is the one the app's SDK logs
+# the code with; the Notification Service Extension logs every code with the category extension.
+
+init.started                   info     both     lifecycle
+init.invalid_app_id            error    both     lifecycle
+init.app_id_changed            warn     both     lifecycle
+init.drain_started             info     both     lifecycle
+init.buffer_full               warn     both     lifecycle
+init.no_delegate               warn     ios      lifecycle
+init.not_main_process          debug    android  lifecycle
+config.no_app_group            info     ios      lifecycle
+status.launch                  info     ios      lifecycle
+status.changed                 info     ios      lifecycle
+consent.waiting                info     both     consent
+consent.given                  info     both     consent
+consent.revoked                info     both     consent
+api.invalid_argument           warn     both     lifecycle
+api.null_argument              error    android  lifecycle
+api.callback_repeated          debug    ios      lifecycle
+api.callback_threw             error    android  lifecycle
+token.received                 info     both     registration
+token.unchanged                debug    both     registration
+token.invalid                  warn     both     registration
+token.missing                  warn     both     registration
+token.registration_failed      warn     ios      registration
+token.firebase_missing         warn     android  registration
+token.auto_init_disabled       debug    android  registration
+token.fetch_failed             warn     android  registration
+register.ok                    info     both     registration
+register.reregistering         info     both     registration
+register.dormant               error    both     registration
+update.sent                    debug    both     registration
+heartbeat.sent                 debug    both     registration
+permission.changed             info     both     registration
+permission.prompt_deferred     info     android  registration
+subscription.opted_out         info     both     registration
+subscription.opted_in          info     both     registration
+login.queued                   debug    both     identity
+login.ok                       info     both     identity
+login.skipped_same             debug    both     identity
+login.switched                 info     both     identity
+login.rejected                 warn     both     identity
+logout.queued                  info     both     identity
+logout.ok                      info     both     identity
+logout.skipped                 debug    both     identity
+identity.token_needed          warn     both     identity
+identity.client_error          error    both     identity
+tags.flushed                   debug    both     tags
+tags.normalized                debug    both     tags
+tags.invalid_key               warn     both     tags
+tags.value_truncated           warn     both     tags
+tags.limit                     warn     both     tags
+tags.rejected_key              warn     both     tags
+events.flushed                 debug    both     events
+events.dropped                 warn     both     events
+events.queue_full              warn     both     events
+inbox.ingested                 debug    ios      events
+inbox.invalid_file             debug    ios      events
+net.retry                      info     both     network
+net.retry_exhausted            warn     both     network
+net.rate_limited               warn     both     network
+net.client_error               error    both     network
+net.redirect_refused           error    both     network
+net.invalid_response           warn     both     network
+net.routes_closed              warn     both     network
+net.monitor_unavailable        warn     android  network
+storage.keychain_locked        warn     ios      storage
+storage.failed                 error    both     storage
+storage.state_reset            error    both     storage
+storage.crypto_reset           warn     android  storage
+notif.foreign                  verbose  both     notifications
+notif.parse_failed             warn     both     notifications
+notif.unknown_version          warn     both     notifications
+notif.off_main_thread          warn     ios      notifications
+notif.suppressed               debug    both     notifications
+notif.display_failed           warn     both     notifications
+notif.image_unusable           warn     android  notifications
+notif.click_queued             debug    both     notifications
+notif.click_delivered          debug    both     notifications
+display.default_icon           warn     android  notifications
+badge.cleared                  debug    both     notifications
+badge.set                      debug    ios      notifications
+badge.zero_skipped             debug    ios      notifications
+badge.channel_badges_on        warn     android  notifications
+fcm.forwarding_hint            info     android  notifications
+work.unavailable               warn     android  lifecycle
+lifecycle.background_expired   warn     ios      lifecycle
+log.dropped                    warn     both     lifecycle
+internal.error                 error    android  lifecycle
+nse.attachment_failed          warn     ios      extension
+nse.expired                    warn     ios      extension
+nse.replaced_request           debug    ios      extension
+nse.received_sent              debug    ios      extension
+nse.received_deferred          info     ios      extension
+nse.badge_set                  debug    ios      extension
+nse.badge_skipped              info     ios      extension

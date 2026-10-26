@@ -1,0 +1,12 @@
+# Version updates for the workflows' actions, which are pinned to full commit ids: Dependabot moves the pin and its
+# version comment together. The SDK itself has no package dependencies. The pull requests are titled
+# "chore(deps): bump ...", a title the PR title check accepts (.github/workflows/lint-pr.yml).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: chore
+      include: scope

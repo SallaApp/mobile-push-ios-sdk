@@ -1,0 +1,28 @@
+# SwiftPM and Xcode build products
+.build/
+.swiftpm/
+DerivedData/
+build/
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Signing material and secrets: never commit them (scripts/verify.sh tree refuses them even when added by force)
+*.p8
+*.p12
+*.pfx
+*.pem
+*.key
+*.cer
+*.mobileprovision
+*.provisionprofile
+GoogleService-Info.plist
+.env
+.env.*

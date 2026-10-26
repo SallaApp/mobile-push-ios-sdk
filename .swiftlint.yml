@@ -1,0 +1,165 @@
+# SwiftLint 0.63.2. Run from the repository root: swiftlint lint --strict --config .swiftlint.yml
+# The crash-safety rules are errors; custom_rules cover the banned patterns that SwiftLint has no
+# rule for. scripts/check-gates.sh repeats them as a plain grep, so they also hold without SwiftLint.
+
+included:
+  - Package.swift
+  - Sources
+  - Tests
+
+excluded:
+  - .build
+
+opt_in_rules:
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+
+disabled_rules:
+  # Multi-line literals end with a comma, as in Package.swift.
+  - trailing_comma
+
+line_length:
+  warning: 140
+  error: 200
+identifier_name:
+  # Wire and file names of the contract (`v`, `at`, `id`), the operation log's `op` and fingerprint `fp`, and the
+  # test harness `h`.
+  excluded: [at, fp, h, id, op, v]
+cyclomatic_complexity:
+  ignores_case_statements: true
+file_length:
+  warning: 600
+  error: 800
+type_body_length:
+  warning: 400
+  error: 500
+function_body_length:
+  warning: 80
+  error: 120
+nesting:
+  type_level: 2
+
+force_unwrapping:
+  severity: error
+force_try:
+  severity: error
+force_cast:
+  severity: error
+implicitly_unwrapped_optional:
+  severity: error
+
+custom_rules:
+  no_trap:
+    name: "No traps"
+    regex: '\b(fatalError|precondition|preconditionFailure|assert|assertionFailure|dispatchPrecondition)\s*\('
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "SallaPush never traps: log and fall back."
+    severity: error
+  no_unowned:
+    name: "No unowned"
+    regex: '\bunowned\b'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Use weak references; unowned can trap."
+    severity: error
+  no_unchecked_dictionary_init:
+    name: "No Dictionary(uniqueKeysWithValues:)"
+    regex: 'Dictionary\s*\(\s*uniqueKeysWithValues\s*:'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Traps on duplicate keys; build the dictionary with a loop."
+    severity: error
+  no_string_format:
+    name: "No String(format:)"
+    regex: 'String\s*\(\s*format\s*:'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Format specifiers can crash on bad input."
+    severity: error
+  no_user_defaults:
+    name: "No UserDefaults"
+    regex: '\bUserDefaults\b'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "SallaPush stores state in its own files and the Keychain."
+    severity: error
+  no_json_serialization_writing:
+    name: "No JSONSerialization writing"
+    regex: 'JSONSerialization\s*\.\s*data\s*\(\s*withJSONObject'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Throws an Objective-C exception on invalid input; use JSONEncoder."
+    severity: error
+  no_assume_isolated:
+    name: "assumeIsolated only in the main-thread helper"
+    regex: '\bassumeIsolated\b'
+    included: '/Sources/.*\.swift$'
+    excluded: '/Sources/SallaPush/Platform/ApplicationClient\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Only MainThread.run in ApplicationClient.swift may call assumeIsolated, after checking the thread."
+    severity: error
+  no_isolation_assertions:
+    name: "No isolation assertions"
+    regex: '\b(preconditionIsolated|assertIsolated)\b'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Isolation assertions trap."
+    severity: error
+  no_main_sync:
+    name: "No DispatchQueue.main.sync"
+    regex: 'DispatchQueue\s*\.\s*main\s*\.\s*sync\b'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Can deadlock; hop to main asynchronously."
+    severity: error
+  no_queue_sync:
+    name: "No .sync in the engine"
+    regex: '\.sync\s*(\{|\()'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Engine-owned code never waits on a queue."
+    severity: error
+  no_timer_source:
+    name: "No dispatch timer sources"
+    regex: '\bmakeTimerSource\b'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Timers are DispatchWorkItems through the Scheduler."
+    severity: error
+  no_suspend:
+    name: "No suspend()"
+    regex: '\.suspend\s*\(\s*\)'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Releasing a suspended dispatch object traps."
+    severity: error
+  no_bundle_module:
+    name: "No Bundle.module"
+    regex: '\bBundle\s*\.\s*module\b'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "The generated accessor traps when the resource bundle is missing."
+    severity: error
+  continuation_only_in_once:
+    name: "Continuations only in Once.swift"
+    regex: '\bwith(Checked|Unsafe)(Throwing)?Continuation\b'
+    included: '/Sources/.*\.swift$'
+    excluded: '/Sources/SallaPushCore/Util/Once\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "Resume continuations through onceContinuation in Util/Once.swift."
+    severity: error
+  no_process_hooks:
+    name: "No swizzling or KVO"
+    regex: '\b(method_exchangeImplementations|method_setImplementation|class_replaceMethod|class_addMethod|forKeyPath)\b'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "No swizzling, no KVO."
+    severity: error
+  no_delegate_assignment:
+    name: "No delegate takeover"
+    regex: '\.delegate\s*=[^=]'
+    included: '/Sources/.*\.swift$'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "SallaPush never assigns a delegate; apps forward to it."
+    severity: error

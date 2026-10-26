@@ -1,0 +1,125 @@
+name: Release
+
+# A release is a tag X.Y.Z or X.Y.Z-(alpha|beta|rc).N on this repository, and SwiftPM installs the tag itself, so this
+# workflow checks a release; it cannot hold one back. It fails, and the tag must not be used, unless:
+#   - the tag is a release version, sallaPushSDKVersion (Sources/SallaPushCore/SallaPushVersion.swift) declares it at
+#     the tagged commit, CHANGELOG.md has its '## [X.Y.Z]' entry there, and a stable tag points at a commit on master
+#     (scripts/release-plan.sh);
+#   - the tagged commit passes the verification of every pull request (verify.yml, on GitHub's macOS runner);
+#   - a stable version keeps the public API of every earlier stable release of its major version on its history, one
+#     whose release run failed included, since SwiftPM installs every pushed tag (scripts/release-plan.sh and
+#     scripts/api-compat.sh); the first release of a new major version is not compared.
+# Then it creates the tag's GitHub Release, with the version's CHANGELOG entry as its notes, in the environment
+# 'release', whose protection rules decide who may let it run. docs/RELEASING.md says how to release.
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-*'
+
+permissions:
+  contents: read
+
+concurrency:
+  # One run per tag, never cancelled mid-way.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Resolve the release
+    # A deleted tag triggers a push event too.
+    if: github.event.deleted != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+      prerelease: ${{ steps.plan.outputs.prerelease }}
+      sha: ${{ steps.plan.outputs.sha }}
+      api_baselines: ${{ steps.plan.outputs.api_baselines }}
+      major_bump: ${{ steps.plan.outputs.major_bump }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # origin/master for the stable check, and the earlier tags for the API baselines.
+          fetch-depth: 0
+          persist-credentials: false
+      # The tag's grammar, the peeled commit (never GITHUB_SHA for an annotated tag), stable only from master, the
+      # declared version and the CHANGELOG entry at that commit, and the API baselines.
+      - id: plan
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          scripts/release-plan.sh "$TAG" | tee -a "$GITHUB_OUTPUT"
+
+  verify:
+    name: Verify
+    needs: resolve
+    uses: ./.github/workflows/verify.yml
+    with:
+      ref: ${{ needs.resolve.outputs.sha }}
+      # Empty for a pre-release, for the first stable release and for the first release of a major version.
+      api_baselines: ${{ needs.resolve.outputs.api_baselines }}
+
+  summary:
+    name: Summary
+    needs: [resolve, verify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Release summary
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+          SHA: ${{ needs.resolve.outputs.sha }}
+          PRERELEASE: ${{ needs.resolve.outputs.prerelease }}
+          API_BASELINES: ${{ needs.resolve.outputs.api_baselines }}
+          MAJOR_BUMP: ${{ needs.resolve.outputs.major_bump }}
+        run: |
+          set -euo pipefail
+          if [ "$PRERELEASE" = true ]; then
+            api="not compared (pre-release)"
+          elif [ -n "$API_BASELINES" ]; then
+            api="no break since any earlier ${VERSION%%.*}.x release: ${API_BASELINES// /, }"
+          elif [ "$MAJOR_BUMP" = true ]; then
+            api="not compared (the first release of major version ${VERSION%%.*})"
+          else
+            api="not compared (the first stable release)"
+          fi
+          {
+            echo "SallaPush iOS SDK $VERSION, tag checked; commit $SHA verified on CI (verify.yml)."
+            echo
+            echo "- Public API: $api"
+            echo "- Apps install it with SwiftPM: \`.package(url: \"https://github.com/SallaApp/mobile-push-ios-sdk.git\", exact: \"$VERSION\")\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # The tag's GitHub Release, once every check passed: the version's CHANGELOG entry is its notes, with relative links
+  # made absolute at the tag (scripts/release-notes.sh), and a pre-release version makes a pre-release.
+  github-release:
+    name: GitHub Release
+    needs: [resolve, summary]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.resolve.outputs.sha }}
+          persist-credentials: false
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+          PRERELEASE: ${{ needs.resolve.outputs.prerelease }}
+          REPOSITORY: ${{ github.repository }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          set -euo pipefail
+          notes="$RUNNER_TEMP/release-notes.md"
+          RELEASE_NOTES_LINK_BASE="$SERVER_URL/$REPOSITORY/blob/$VERSION/" scripts/release-notes.sh "$VERSION" >"$notes"
+          flags=()
+          [ "$PRERELEASE" != true ] || flags+=(--prerelease)
+          gh release create "$VERSION" --repo "$REPOSITORY" --verify-tag --title "$VERSION" --notes-file "$notes" \
+            ${flags[@]+"${flags[@]}"}

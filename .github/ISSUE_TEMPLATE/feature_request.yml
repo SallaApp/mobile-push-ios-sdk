@@ -1,0 +1,22 @@
+name: Feature request
+description: Suggest a change to the SDK.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you need?
+      description: The problem you want to solve, and why the SDK can't solve it today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How the SDK could solve it, with the API you have in mind, if any.
+  - type: input
+    id: platforms
+    attributes:
+      label: Platforms
+      description: Such as iOS, Android, Flutter, React Native or Capacitor.

@@ -1,0 +1,69 @@
+name: CI
+
+# For every pull request and every push to master, on GitHub-hosted runners: the full verification of the SDK on macOS
+# (verify.yml, which runs scripts/verify.sh step by step), and the checks that need no Xcode, on Linux. 'Testing Ready'
+# sums them up in one check.
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # A new push to a pull request replaces its running verification; every commit of master is verified.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # What needs no Xcode, on Linux: the version and its CHANGELOG entry, the golden payloads, the log catalogue, the
+  # Markdown links, what a commit takes and the README check (verify.yml repeats them), the tooling's own tests, and
+  # shellcheck.
+  checks:
+    name: Checks (no Xcode)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Version, golden payloads, log catalogue, Markdown links, what a commit takes and README snippets
+        run: scripts/verify.sh version goldens catalogue links tree snippets
+      - name: Tooling self-test (release-plan.sh, verify.sh, check-log-catalogue.sh)
+        run: scripts/self-test.sh
+      # The image is pinned by the digest of koalaman/shellcheck:v0.11.0's image index. Re-confirm it with Docker Hub's
+      # registry API (the docker-content-digest of manifests/v0.11.0).
+      - name: shellcheck
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$PWD:/mnt:ro" -w /mnt \
+            koalaman/shellcheck:v0.11.0@sha256:61862eba1fcf09a484ebcc6feea46f1782532571a34ed51fedf90dd25f925a8d \
+            -x -S style scripts/*.sh
+
+  verify:
+    name: Verify
+    uses: ./.github/workflows/verify.yml
+
+  # 'Testing Ready' passes when every job above succeeded or was skipped, and fails when one failed or was cancelled,
+  # so a ruleset can require this one check.
+  testing-ready:
+    name: Testing Ready
+    if: always()
+    needs: [checks, verify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Every job above succeeded or was skipped
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          set -euo pipefail
+          for result in $RESULTS; do
+            case "$result" in
+              success | skipped) ;;
+              *) echo "::error::a job this check needs ended with $result"; exit 1 ;;
+            esac
+          done
+          echo "every job succeeded or was skipped: $RESULTS"

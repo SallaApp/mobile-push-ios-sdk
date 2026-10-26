@@ -1,0 +1,109 @@
+name: Lint PR
+
+# The checks 'Validate PR title' and 'Validate branch name', which the organization's rule set requires for pull
+# requests, with the rules of Salla's own checks, in plain bash. The title and the branch reach the scripts as
+# environment variables, never in the scripts' text.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  # <type>(<scope>): <subject>, matched exactly. Dependabot's titles pass: chore(deps): ... (.github/dependabot.yml).
+  # A pull request labelled bot or ignore-semantic-pull-request skips this check, and a skipped check counts as passed.
+  title:
+    name: Validate PR title
+    if: >-
+      ${{ !contains(github.event.pull_request.labels.*.name, 'bot') &&
+      !contains(github.event.pull_request.labels.*.name, 'ignore-semantic-pull-request') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 'The title is <type>(<scope>): <subject>'
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+          types=(docs fix hotfix feat 'BREAKING CHANGE' refactor test perf build ci revert chore release)
+          areas=(catalog orders payments checkout journey partners platforms themes auth marketing shipping devops
+            security pos mobile ui core deps deps-dev sc data i18n)
+          header='^([A-Za-z0-9_]+( [A-Za-z0-9_]+)*)(\(([A-Za-z0-9_$.* -]*)\))?: (.*)$'
+          ticket='^[A-Z]+-[0-9]+$'
+          version='^v?([0-9]+\.)?([0-9]+\.)?(\*|[0-9]+)$'
+          mahlly='^mahlly(-.+)?$'
+          blank='^[[:space:]]*$'
+          listed() {
+            local word="$1" item
+            shift
+            for item in "$@"; do
+              if [ "$word" = "$item" ]; then
+                return 0
+              fi
+            done
+            return 1
+          }
+          known_scope() {
+            listed "$1" "${areas[@]}" || [[ $1 =~ $ticket || $1 =~ $version || $1 =~ $mahlly ]]
+          }
+          problems=()
+          if [[ $TITLE =~ $header ]]; then
+            type="${BASH_REMATCH[1]}"
+            scope="${BASH_REMATCH[4]}"
+            subject="${BASH_REMATCH[5]}"
+            listed "$type" "${types[@]}" || problems+=("'$type' is not a type")
+            if [ -z "$scope" ]; then
+              problems+=("the scope is missing")
+            elif ! known_scope "$scope"; then
+              problems+=("'$scope' is not a scope")
+            fi
+            if [[ $subject =~ $blank ]]; then
+              problems+=("the subject is empty")
+            fi
+          else
+            problems+=("it is not <type>(<scope>): <subject>")
+          fi
+          printf 'PR title: %s\n' "$TITLE"
+          if [ "${#problems[@]}" -eq 0 ]; then
+            echo "The title passes."
+            exit 0
+          fi
+          printf -v found '%s; ' "${problems[@]}"
+          printf -v type_list '%s, ' "${types[@]}"
+          printf -v area_list '%s, ' "${areas[@]}"
+          printf '::error::The PR title fails: %s. A title that passes: %s\n' "${found%; }" \
+            'fix(mobile): retry a failed registration'
+          printf '%s\n' "Types: ${type_list%, }." \
+            "Scopes: a ticket key in capitals such as PROJ-123, a version such as 1.2.3, mahlly or mahlly-<suffix>," \
+            "or one of ${area_list%, }."
+          exit 1
+
+  # <prefix>/<KEY>-<number>[-<words>] with the prefix feature, bugfix, hotfix or test, dependabot/<name>, or
+  # release/<version>, in any case.
+  branch:
+    name: Validate branch name
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: The branch is <prefix>/<KEY>-<number>[-<words>], dependabot/<name> or release/<version>
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          shopt -s nocasematch
+          ticket='(bugfix|hotfix|feature|test)/[a-zA-Z0-9]+-[0-9]{1,10}(-[^/]+)?$'
+          dependabot='^dependabot/[a-zA-Z0-9_]+.+'
+          release='release/v?([0-9]+\.)?([0-9]+\.)?(\*|[0-9]+)'
+          printf 'Branch: %s\n' "$BRANCH"
+          if [[ $BRANCH =~ $ticket || $BRANCH =~ $dependabot || $BRANCH =~ $release ]]; then
+            echo "The branch name passes."
+            exit 0
+          fi
+          printf '::error::The branch name fails: it is not %s, %s or %s. A branch name that passes: %s\n' \
+            '<prefix>/<KEY>-<number>[-<words>]' 'dependabot/<name>' 'release/<version>' \
+            'feature/PROJ-123-retry-registration'
+          printf '%s\n' \
+            "The prefix is feature, bugfix, hotfix or test; fix, feat, docs and chore are PR title types only." \
+            "A pull request can't change its branch: push to a branch whose name passes and open a new pull request."
+          exit 1

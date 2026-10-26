@@ -1,0 +1,20 @@
+{
+  "platform": 1,
+  "tokens": ["t1"],
+  "notif_id": "msg_1",
+  "topic": "com.salla.store1",
+  "production": true,
+  "title": "تم شحن طلبك",
+  "message": "طلبك رقم 987 في الطريق",
+  "sound": "orders.wav",
+  "badge": 1,
+  "mutable_content": true,
+  "data": {
+    "custom": {
+      "i": "7d3f1c2a-0000-4000-8000-000000000001",
+      "a": { "type": "order", "id": "987", "push_ref": "msg_1" },
+      "u": "https://s.salla.sa/o/987"
+    },
+    "att": { "id": "https://cdn.salla.sa/x.jpg" }
+  }
+}

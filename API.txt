@@ -1,0 +1,175 @@
+SallaPush | swift.class | SallaPush | @objc(SallaPush) final class SallaPush
+SallaPush | swift.class | SallaPushClickEvent | @objc final class SallaPushClickEvent
+SallaPush | swift.class | SallaPushClickResult | @objc final class SallaPushClickResult
+SallaPush | swift.class | SallaPushConfiguration | @objc final class SallaPushConfiguration
+SallaPush | swift.class | SallaPushDebug | @objc final class SallaPushDebug
+SallaPush | swift.class | SallaPushNotificationCenterDelegate | @objc class SallaPushNotificationCenterDelegate
+SallaPush | swift.class | SallaPushNotifications | @objc final class SallaPushNotifications
+SallaPush | swift.class | SallaPushObservation | final class SallaPushObservation
+SallaPush | swift.class | SallaPushSubscription | @objc final class SallaPushSubscription
+SallaPush | swift.class | SallaPushSubscriptionChangedState | @objc final class SallaPushSubscriptionChangedState
+SallaPush | swift.class | SallaPushSubscriptionState | @objc final class SallaPushSubscriptionState
+SallaPush | swift.class | SallaPushUser | @objc final class SallaPushUser
+SallaPush | swift.class | SallaPushUserChangedState | @objc final class SallaPushUserChangedState
+SallaPush | swift.class | SallaPushUserState | @objc final class SallaPushUserState
+SallaPush | swift.class | SallaPushWillDisplayEvent | @objc final class SallaPushWillDisplayEvent
+SallaPush | swift.enum | SallaPushLoginFailure | @objc enum SallaPushLoginFailure
+SallaPush | swift.enum.case | SallaPushLoginFailure.invalidRequest | case invalidRequest
+SallaPush | swift.enum.case | SallaPushLoginFailure.tokenRejected | case tokenRejected
+SallaPush | swift.init | SallaPushConfiguration.init() | override init()
+SallaPush | swift.init | SallaPushLoginFailure.init(rawValue:) | init?(rawValue: Int)
+SallaPush | swift.init | SallaPushNotificationCenterDelegate.init() | override init()
+SallaPush | swift.method | SallaPushClickListener.onClick(event:) | @MainActor func onClick(event: SallaPushClickEvent)
+SallaPush | swift.method | SallaPushConfiguration.copy(with:) | func copy(with zone: NSZone? = nil) -> Any
+SallaPush | swift.method | SallaPushDebug.setLogHandler(level:_:) | @objc(setLogHandlerWithLevel:handler:) func setLogHandler(level: SallaPushLogLevel = .warn, _ handler: (@Sendable (SallaPushLogEntry) -> Void)?)
+SallaPush | swift.method | SallaPushDebug.setLogLevel(_:) | func setLogLevel(_ level: SallaPushLogLevel)
+SallaPush | swift.method | SallaPushForegroundLifecycleListener.onWillDisplay(event:) | @MainActor func onWillDisplay(event: SallaPushWillDisplayEvent)
+SallaPush | swift.method | SallaPushNotification.display() | @objc func display()
+SallaPush | swift.method | SallaPushNotificationCenterDelegate.userNotificationCenter(_:didReceive:withCompletionHandler:) | func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void)
+SallaPush | swift.method | SallaPushNotificationCenterDelegate.userNotificationCenter(_:willPresent:withCompletionHandler:) | func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void)
+SallaPush | swift.method | SallaPushNotifications.addClickListener(_:) | @objc func addClickListener(_ listener: any SallaPushClickListener)
+SallaPush | swift.method | SallaPushNotifications.addClickListener(_:) | func addClickListener(_ handler: @escaping @MainActor @Sendable (SallaPushClickEvent) -> Void) -> SallaPushObservation
+SallaPush | swift.method | SallaPushNotifications.addForegroundLifecycleListener(_:) | @objc func addForegroundLifecycleListener(_ listener: any SallaPushForegroundLifecycleListener)
+SallaPush | swift.method | SallaPushNotifications.addForegroundLifecycleListener(_:) | func addForegroundLifecycleListener(_ handler: @escaping @MainActor @Sendable (SallaPushWillDisplayEvent) -> Void) -> SallaPushObservation
+SallaPush | swift.method | SallaPushNotifications.addPermissionObserver(_:) | @objc func addPermissionObserver(_ observer: any SallaPushPermissionObserver)
+SallaPush | swift.method | SallaPushNotifications.addPermissionObserver(_:) | func addPermissionObserver(_ handler: @escaping @MainActor @Sendable (Bool) -> Void) -> SallaPushObservation
+SallaPush | swift.method | SallaPushNotifications.clearAll() | @objc func clearAll()
+SallaPush | swift.method | SallaPushNotifications.didFailToRegisterForRemoteNotifications(error:) | @objc(didFailToRegisterForRemoteNotificationsWithError:) func didFailToRegisterForRemoteNotifications(error: any Error)
+SallaPush | swift.method | SallaPushNotifications.didReceive(_:) | @discardableResult @objc(didReceiveNotificationResponse:) func didReceive(_ response: UNNotificationResponse) -> Bool
+SallaPush | swift.method | SallaPushNotifications.didReceiveRemoteNotification(_:) | @discardableResult @objc(didReceiveRemoteNotification:) func didReceiveRemoteNotification(_ userInfo: [AnyHashable : Any]) -> Bool
+SallaPush | swift.method | SallaPushNotifications.didRegisterForRemoteNotifications(deviceToken:) | @objc(didRegisterForRemoteNotificationsWithDeviceToken:) func didRegisterForRemoteNotifications(deviceToken: Data)
+SallaPush | swift.method | SallaPushNotifications.isSallaPushNotification(_:) | @objc func isSallaPushNotification(_ userInfo: [AnyHashable : Any]) -> Bool
+SallaPush | swift.method | SallaPushNotifications.parse(_:) | @objc func parse(_ userInfo: [AnyHashable : Any]) -> SallaPushNotification?
+SallaPush | swift.method | SallaPushNotifications.refreshPermission() | @objc func refreshPermission()
+SallaPush | swift.method | SallaPushNotifications.registerForProvisionalAuthorization(completion:) | @objc(registerForProvisionalAuthorizationWithCompletion:) func registerForProvisionalAuthorization(completion: (@MainActor @Sendable (Bool) -> Void)?)
+SallaPush | swift.method | SallaPushNotifications.registerForRemoteNotifications() | @objc func registerForRemoteNotifications()
+SallaPush | swift.method | SallaPushNotifications.removeClickListener(_:) | @objc func removeClickListener(_ listener: any SallaPushClickListener)
+SallaPush | swift.method | SallaPushNotifications.removeForegroundLifecycleListener(_:) | @objc func removeForegroundLifecycleListener(_ listener: any SallaPushForegroundLifecycleListener)
+SallaPush | swift.method | SallaPushNotifications.removePermissionObserver(_:) | @objc func removePermissionObserver(_ observer: any SallaPushPermissionObserver)
+SallaPush | swift.method | SallaPushNotifications.requestPermission(fallbackToSettings:) | func requestPermission(fallbackToSettings: Bool = false) async -> Bool
+SallaPush | swift.method | SallaPushNotifications.requestPermission(fallbackToSettings:completion:) | @objc(requestPermissionWithFallbackToSettings:completion:) func requestPermission(fallbackToSettings: Bool, completion: (@MainActor @Sendable (Bool) -> Void)?)
+SallaPush | swift.method | SallaPushNotifications.willPresent(_:) | func willPresent(_ notification: UNNotification) -> UNNotificationPresentationOptions?
+SallaPush | swift.method | SallaPushNotifications.willPresent(_:presentationOptions:) | @objc(willPresentNotification:presentationOptions:) func willPresent(_ notification: UNNotification, presentationOptions: UnsafeMutablePointer<UNNotificationPresentationOptions>?) -> Bool
+SallaPush | swift.method | SallaPushObservation.cancel() | func cancel()
+SallaPush | swift.method | SallaPushPermissionObserver.onNotificationPermissionDidChange(_:) | @MainActor func onNotificationPermissionDidChange(_ permission: Bool)
+SallaPush | swift.method | SallaPushSubscription.addObserver(_:) | @objc func addObserver(_ observer: any SallaPushSubscriptionObserver)
+SallaPush | swift.method | SallaPushSubscription.addObserver(_:) | func addObserver(_ handler: @escaping @MainActor @Sendable (SallaPushSubscriptionChangedState) -> Void) -> SallaPushObservation
+SallaPush | swift.method | SallaPushSubscription.optIn() | @objc func optIn()
+SallaPush | swift.method | SallaPushSubscription.optOut() | @objc func optOut()
+SallaPush | swift.method | SallaPushSubscription.removeObserver(_:) | @objc func removeObserver(_ observer: any SallaPushSubscriptionObserver)
+SallaPush | swift.method | SallaPushSubscriptionObserver.onPushSubscriptionDidChange(state:) | @MainActor func onPushSubscriptionDidChange(state: SallaPushSubscriptionChangedState)
+SallaPush | swift.method | SallaPushUser.addLoginFailureHandler(_:) | func addLoginFailureHandler(_ handler: @escaping @MainActor @Sendable (SallaPushLoginFailure) -> Void) -> SallaPushObservation
+SallaPush | swift.method | SallaPushUser.addObserver(_:) | @objc func addObserver(_ observer: any SallaPushUserObserver)
+SallaPush | swift.method | SallaPushUser.addObserver(_:) | func addObserver(_ handler: @escaping @MainActor @Sendable (SallaPushUserChangedState) -> Void) -> SallaPushObservation
+SallaPush | swift.method | SallaPushUser.addTag(key:value:) | @objc(addTagWithKey:value:) func addTag(key: String, value: String)
+SallaPush | swift.method | SallaPushUser.addTags(_:) | @nonobjc func addTags(_ tags: [String : String])
+SallaPush | swift.method | SallaPushUser.getTags() | @objc func getTags() -> [String : String]
+SallaPush | swift.method | SallaPushUser.objcAddTags(_:) | @objc(addTags:) func objcAddTags(_ tags: [AnyHashable : Any])
+SallaPush | swift.method | SallaPushUser.objcRemoveTags(_:) | @objc(removeTags:) func objcRemoveTags(_ keys: [Any])
+SallaPush | swift.method | SallaPushUser.removeObserver(_:) | @objc func removeObserver(_ observer: any SallaPushUserObserver)
+SallaPush | swift.method | SallaPushUser.removeTag(_:) | @objc func removeTag(_ key: String)
+SallaPush | swift.method | SallaPushUser.removeTags(_:) | @nonobjc func removeTags(_ keys: [String])
+SallaPush | swift.method | SallaPushUser.setLanguage(_:) | @objc func setLanguage(_ language: String?)
+SallaPush | swift.method | SallaPushUserObserver.onLoginFailure(_:) | @MainActor @objc optional func onLoginFailure(_ failure: SallaPushLoginFailure)
+SallaPush | swift.method | SallaPushUserObserver.onUserStateDidChange(state:) | @MainActor func onUserStateDidChange(state: SallaPushUserChangedState)
+SallaPush | swift.method | SallaPushWillDisplayEvent.preventDefault() | @objc func preventDefault()
+SallaPush | swift.property | SallaPushClickEvent.notification | @objc let notification: SallaPushNotification
+SallaPush | swift.property | SallaPushClickEvent.result | @objc let result: SallaPushClickResult
+SallaPush | swift.property | SallaPushClickResult.actionId | @objc let actionId: String?
+SallaPush | swift.property | SallaPushClickResult.url | @objc let url: String?
+SallaPush | swift.property | SallaPushConfiguration.apnsEnvironment | @objc var apnsEnvironment: SallaPushAPNsEnvironment
+SallaPush | swift.property | SallaPushConfiguration.appGroupIdentifier | @objc var appGroupIdentifier: String?
+SallaPush | swift.property | SallaPushConfiguration.appVersion | @objc var appVersion: String?
+SallaPush | swift.property | SallaPushConfiguration.autoClearBadge | @objc var autoClearBadge: Bool
+SallaPush | swift.property | SallaPushConfiguration.autoUpdateBadge | @objc var autoUpdateBadge: Bool
+SallaPush | swift.property | SallaPushConfiguration.clearTagsOnLogout | @objc var clearTagsOnLogout: Bool
+SallaPush | swift.property | SallaPushConfiguration.logLevel | @objc var logLevel: SallaPushLogLevel { get set }
+SallaPush | swift.property | SallaPushConfiguration.openLaunchURLs | @objc var openLaunchURLs: Bool
+SallaPush | swift.property | SallaPushConfiguration.registerForRemoteNotificationsOnInit | @objc var registerForRemoteNotificationsOnInit: Bool
+SallaPush | swift.property | SallaPushConfiguration.requiresUserConsent | @objc var requiresUserConsent: Bool
+SallaPush | swift.property | SallaPushDebug.logLevel | @objc var logLevel: SallaPushLogLevel { get set }
+SallaPush | swift.property | SallaPushNotifications.canRequestPermission | @objc var canRequestPermission: Bool { get }
+SallaPush | swift.property | SallaPushNotifications.notificationCenterDelegate | @objc var notificationCenterDelegate: SallaPushNotificationCenterDelegate { get }
+SallaPush | swift.property | SallaPushNotifications.permission | @objc var permission: Bool { get }
+SallaPush | swift.property | SallaPushNotifications.permissionStatus | @objc var permissionStatus: UNAuthorizationStatus { get }
+SallaPush | swift.property | SallaPushSubscription.id | @objc var id: String? { get }
+SallaPush | swift.property | SallaPushSubscription.optedIn | @objc var optedIn: Bool { get }
+SallaPush | swift.property | SallaPushSubscription.token | @objc var token: String? { get }
+SallaPush | swift.property | SallaPushSubscriptionChangedState.current | @objc let current: SallaPushSubscriptionState
+SallaPush | swift.property | SallaPushSubscriptionChangedState.previous | @objc let previous: SallaPushSubscriptionState
+SallaPush | swift.property | SallaPushSubscriptionState.id | @objc let id: String?
+SallaPush | swift.property | SallaPushSubscriptionState.optedIn | @objc let optedIn: Bool
+SallaPush | swift.property | SallaPushSubscriptionState.token | @objc let token: String?
+SallaPush | swift.property | SallaPushUser.externalId | @objc var externalId: String? { get }
+SallaPush | swift.property | SallaPushUser.isLoggedIn | @objc var isLoggedIn: Bool { get }
+SallaPush | swift.property | SallaPushUser.pushSubscription | @objc var pushSubscription: SallaPushSubscription { get }
+SallaPush | swift.property | SallaPushUserChangedState.current | @objc let current: SallaPushUserState
+SallaPush | swift.property | SallaPushUserChangedState.previous | @objc let previous: SallaPushUserState
+SallaPush | swift.property | SallaPushUserState.externalId | @objc let externalId: String?
+SallaPush | swift.property | SallaPushUserState.isLoggedIn | @objc let isLoggedIn: Bool
+SallaPush | swift.property | SallaPushWillDisplayEvent.isPrevented | @objc var isPrevented: Bool { get }
+SallaPush | swift.property | SallaPushWillDisplayEvent.notification | @objc let notification: SallaPushNotification
+SallaPush | swift.protocol | SallaPushClickListener | @objc protocol SallaPushClickListener
+SallaPush | swift.protocol | SallaPushForegroundLifecycleListener | @objc protocol SallaPushForegroundLifecycleListener
+SallaPush | swift.protocol | SallaPushPermissionObserver | @objc protocol SallaPushPermissionObserver
+SallaPush | swift.protocol | SallaPushSubscriptionObserver | @objc protocol SallaPushSubscriptionObserver
+SallaPush | swift.protocol | SallaPushUserObserver | @objc protocol SallaPushUserObserver
+SallaPush | swift.type.method | SallaPush.initialize(_:withLaunchOptions:) | @objc(initialize:withLaunchOptions:) static func initialize(_ appId: String, withLaunchOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil)
+SallaPush | swift.type.method | SallaPush.initialize(_:withLaunchOptions:configuration:) | @objc(initialize:withLaunchOptions:configuration:) static func initialize(_ appId: String, withLaunchOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]?, configuration: SallaPushConfiguration)
+SallaPush | swift.type.method | SallaPush.login(externalId:identityToken:) | @objc static func login(externalId: String, identityToken: String)
+SallaPush | swift.type.method | SallaPush.logout() | @objc static func logout()
+SallaPush | swift.type.method | SallaPush.setConsentGiven(_:) | @objc static func setConsentGiven(_ given: Bool)
+SallaPush | swift.type.method | SallaPush.setConsentRequired(_:) | @objc static func setConsentRequired(_ required: Bool)
+SallaPush | swift.type.property | SallaPush.Debug | @objc static var Debug: SallaPushDebug { get }
+SallaPush | swift.type.property | SallaPush.Notifications | @objc static var Notifications: SallaPushNotifications { get }
+SallaPush | swift.type.property | SallaPush.User | @objc static var User: SallaPushUser { get }
+SallaPush | swift.type.property | SallaPush.appId | @objc static var appId: String? { get }
+SallaPush | swift.type.property | SallaPush.isInitialized | @objc static var isInitialized: Bool { get }
+SallaPush | swift.type.property | SallaPush.sdkVersion | @objc static var sdkVersion: String { get }
+SallaPushCore | swift.class | SallaPushLogEntry | @objc final class SallaPushLogEntry
+SallaPushCore | swift.class | SallaPushNotification | @objc final class SallaPushNotification
+SallaPushCore | swift.enum | SallaPushAPNsEnvironment | @objc enum SallaPushAPNsEnvironment
+SallaPushCore | swift.enum | SallaPushLogLevel | @objc enum SallaPushLogLevel
+SallaPushCore | swift.enum | SallaPushPayloadSource | @objc enum SallaPushPayloadSource
+SallaPushCore | swift.enum.case | SallaPushAPNsEnvironment.automatic | case automatic
+SallaPushCore | swift.enum.case | SallaPushAPNsEnvironment.production | case production
+SallaPushCore | swift.enum.case | SallaPushAPNsEnvironment.sandbox | case sandbox
+SallaPushCore | swift.enum.case | SallaPushLogLevel.debug | case debug
+SallaPushCore | swift.enum.case | SallaPushLogLevel.error | case error
+SallaPushCore | swift.enum.case | SallaPushLogLevel.info | case info
+SallaPushCore | swift.enum.case | SallaPushLogLevel.off | case off
+SallaPushCore | swift.enum.case | SallaPushLogLevel.verbose | case verbose
+SallaPushCore | swift.enum.case | SallaPushLogLevel.warn | case warn
+SallaPushCore | swift.enum.case | SallaPushPayloadSource.compat | case compat
+SallaPushCore | swift.enum.case | SallaPushPayloadSource.native | case native
+SallaPushCore | swift.init | SallaPushAPNsEnvironment.init(rawValue:) | init?(rawValue: Int)
+SallaPushCore | swift.init | SallaPushLogLevel.init(rawValue:) | init?(rawValue: Int)
+SallaPushCore | swift.init | SallaPushPayloadSource.init(rawValue:) | init?(rawValue: Int)
+SallaPushCore | swift.method | SallaPushNotification.bool(forKey:) | func bool(forKey key: String) -> Bool?
+SallaPushCore | swift.method | SallaPushNotification.int(forKey:) | func int(forKey key: String) -> Int?
+SallaPushCore | swift.method | SallaPushNotification.number(forKey:) | @objc(numberForKey:) func number(forKey key: String) -> NSNumber?
+SallaPushCore | swift.method | SallaPushNotification.string(forKey:) | @objc func string(forKey key: String) -> String?
+SallaPushCore | swift.property | SallaPushLogEntry.category | @objc let category: String
+SallaPushCore | swift.property | SallaPushLogEntry.code | @objc let code: String
+SallaPushCore | swift.property | SallaPushLogEntry.date | @objc let date: Date
+SallaPushCore | swift.property | SallaPushLogEntry.level | @objc let level: SallaPushLogLevel
+SallaPushCore | swift.property | SallaPushLogEntry.message | @objc let message: String
+SallaPushCore | swift.property | SallaPushLogEntry.metadata | @objc let metadata: [String : String]
+SallaPushCore | swift.property | SallaPushNotification.additionalData | @objc let additionalData: [String : Any]
+SallaPushCore | swift.property | SallaPushNotification.badge | @objc let badge: NSNumber?
+SallaPushCore | swift.property | SallaPushNotification.body | @objc let body: String?
+SallaPushCore | swift.property | SallaPushNotification.imageURL | @objc let imageURL: URL?
+SallaPushCore | swift.property | SallaPushNotification.launchURL | @objc let launchURL: String?
+SallaPushCore | swift.property | SallaPushNotification.notificationId | @objc let notificationId: String?
+SallaPushCore | swift.property | SallaPushNotification.rawPayload | @objc let rawPayload: [AnyHashable : Any]
+SallaPushCore | swift.property | SallaPushNotification.sound | @objc let sound: String?
+SallaPushCore | swift.property | SallaPushNotification.source | @objc let source: SallaPushPayloadSource
+SallaPushCore | swift.property | SallaPushNotification.subtitle | @objc let subtitle: String?
+SallaPushCore | swift.property | SallaPushNotification.threadId | @objc let threadId: String?
+SallaPushCore | swift.property | SallaPushNotification.title | @objc let title: String?
+SallaPushExtension | swift.class | SallaPushServiceExtension | @objc final class SallaPushServiceExtension
+SallaPushExtension | swift.init | SallaPushServiceExtension.init() | override convenience init()
+SallaPushExtension | swift.init | SallaPushServiceExtension.init(appGroupIdentifier:) | @objc init(appGroupIdentifier: String?)
+SallaPushExtension | swift.method | SallaPushServiceExtension.didReceive(_:withContentHandler:) | @discardableResult @objc func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) -> Bool
+SallaPushExtension | swift.method | SallaPushServiceExtension.serviceExtensionTimeWillExpire() | @discardableResult @objc func serviceExtensionTimeWillExpire() -> Bool
+SallaPushExtension | swift.type.method | SallaPushServiceExtension.isSallaPushNotification(_:) | @objc static func isSallaPushNotification(_ request: UNNotificationRequest) -> Bool

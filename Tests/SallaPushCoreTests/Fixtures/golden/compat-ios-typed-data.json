@@ -1,0 +1,17 @@
+{
+  "platform": 1,
+  "tokens": ["t1"],
+  "notif_id": "msg_1",
+  "topic": "com.salla.store1",
+  "production": true,
+  "title": "T",
+  "message": "B",
+  "sound": "default",
+  "mutable_content": true,
+  "data": {
+    "custom": {
+      "i": "7d3f1c2a-0000-4000-8000-000000000001",
+      "a": { "id": 987, "flag": true, "type": "product", "push_ref": "msg_1" }
+    }
+  }
+}

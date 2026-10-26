@@ -1,0 +1,25 @@
+{
+  "notifications": [
+    {
+      "platform": 1,
+      "topic": "sa.salla.store123",
+      "production": true,
+      "tokens": ["aabbccdd11223344aabbccdd11223344aabbccdd11223344aabbccdd11223344"],
+      "notif_id": "msg_test_001",
+      "title": "تم شحن طلبك",
+      "message": "طلبك رقم 987 في الطريق",
+      "mutable_content": true,
+      "badge": 1,
+      "sound": "default",
+      "thread-id": "orders",
+      "collapse_id": "order-987",
+      "data": {
+        "sp_v": "1",
+        "sp_id": "msg_test_001",
+        "sp_image": "https://cdn.salla.sa/x.jpg",
+        "sp_url": "salla://orders/987",
+        "orderId": "987"
+      }
+    }
+  ]
+}
