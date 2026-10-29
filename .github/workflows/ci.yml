@@ -1,6 +1,6 @@
 name: CI
 
-# For every pull request and every push to master, on GitHub-hosted runners: the full verification of the SDK on macOS
+# For every pull request and every push to master, on the org's own runners: the full verification of the SDK on macOS
 # (verify.yml, which runs scripts/verify.sh step by step), and the checks that need no Xcode, on Linux. 'Testing Ready'
 # sums them up in one check.
 on:
@@ -22,7 +22,7 @@ jobs:
   # shellcheck.
   checks:
     name: Checks (no Xcode)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.RUNS_ON) }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -51,7 +51,7 @@ jobs:
     name: Testing Ready
     if: always()
     needs: [checks, verify]
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.RUNS_ON) }}
     timeout-minutes: 5
     permissions: {}
     steps:

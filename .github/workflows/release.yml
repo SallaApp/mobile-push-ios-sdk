@@ -30,7 +30,7 @@ jobs:
     name: Resolve the release
     # A deleted tag triggers a push event too.
     if: github.event.deleted != true
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.RUNS_ON) }}
     timeout-minutes: 10
     outputs:
       version: ${{ steps.plan.outputs.version }}
@@ -65,7 +65,7 @@ jobs:
   summary:
     name: Summary
     needs: [resolve, verify]
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.RUNS_ON) }}
     timeout-minutes: 5
     steps:
       - name: Release summary
@@ -98,7 +98,7 @@ jobs:
   github-release:
     name: GitHub Release
     needs: [resolve, summary]
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.RUNS_ON) }}
     timeout-minutes: 10
     environment: release
     permissions:
