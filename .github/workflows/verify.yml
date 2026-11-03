@@ -24,7 +24,7 @@ jobs:
   ios-sdk:
     name: iOS SDK
     # GitHub's macOS 26 image (arm64), which carries several Xcode 26 versions; the first step picks the newest.
-    runs-on: macos-26
+    runs-on: ${{ vars.RUNS_ON_MACOS && fromJSON(vars.RUNS_ON_MACOS) || 'macos-26' }}
     timeout-minutes: 120
     env:
       SWIFTLINT_VERSION: 0.63.2
