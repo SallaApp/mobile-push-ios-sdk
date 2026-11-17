@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'SallaPush'
-  s.version          = '1.0.4'
+  s.version          = '1.1.0'
   s.summary          = 'SallaPush iOS SDK: push notifications for the iOS apps of Salla stores.'
   s.description      = 'Registers the device with the SallaPush server, links customers, sends tags and events, and handles SallaPush notifications.'
   s.homepage         = 'https://github.com/SallaApp/mobile-push-ios-sdk'

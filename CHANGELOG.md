@@ -5,6 +5,8 @@ and versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-04
+
 The first public release of the SallaPush iOS SDK, for the mobile apps of Salla stores.
 
 ### Added

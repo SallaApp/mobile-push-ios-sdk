@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'SallaPushCore'
-  s.version          = '1.0.4'
+  s.version          = '1.1.0'
   s.summary          = 'The shared core of the SallaPush iOS SDK.'
   s.description      = 'Networking, storage, payload parsing and logging shared by SallaPush and SallaPushExtension.'
   s.homepage         = 'https://github.com/SallaApp/mobile-push-ios-sdk'

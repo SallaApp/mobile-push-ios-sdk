@@ -28,7 +28,7 @@ final class UpdateTests: XCTestCase {
         XCTAssertEqual(body["opted_in"] as? Bool, true)
         XCTAssertEqual(body["apns_env"] as? String, "sandbox")
         XCTAssertEqual(body["language"] as? String, "ar")
-        XCTAssertEqual(body["sdk_version"] as? String, "1.0.4")
+        XCTAssertEqual(body["sdk_version"] as? String, "1.1.0")
         XCTAssertTrue(h.logs.contains("heartbeat.sent"))
         XCTAssertEqual(updates.first?.headers["authorization"]?.hasPrefix("Device "), true)
     }

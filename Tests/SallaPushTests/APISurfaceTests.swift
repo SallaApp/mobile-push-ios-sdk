@@ -127,7 +127,7 @@ final class APISurfaceTests: XCTestCase {
         h.settle()
         XCTAssertTrue(granted)
         XCTAssertTrue(SallaPush.isInitialized)
-        XCTAssertEqual(SallaPush.sdkVersion, "1.0.4")
+        XCTAssertEqual(SallaPush.sdkVersion, "1.1.0")
         XCTAssertEqual(SallaPush.appId, "st_42_ios")
         XCTAssertEqual(delegate.observations.count, 6)
         XCTAssertNotNil(SallaPush.Notifications.notificationCenterDelegate)

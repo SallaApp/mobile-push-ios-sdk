@@ -24,7 +24,7 @@ final class RegistrationTests: XCTestCase {
         XCTAssertEqual(body["apns_env"] as? String, "sandbox")
         XCTAssertEqual(body["opted_in"] as? Bool, true)
         XCTAssertEqual(body["app_version"] as? String, "5.0.38")
-        XCTAssertEqual(body["sdk_version"] as? String, "1.0.4")
+        XCTAssertEqual(body["sdk_version"] as? String, "1.1.0")
         XCTAssertEqual(body["os_version"] as? String, "18.0.0")
         XCTAssertEqual(body["device_model"] as? String, "iPhone15,2")
         XCTAssertEqual(body["language"] as? String, "ar")

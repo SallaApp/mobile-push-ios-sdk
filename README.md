@@ -9,7 +9,7 @@ links the signed-in customer, and shows and reports SallaPush notifications.
 
 > **SallaPush is for the mobile apps of Salla stores.** Contact the Salla team for your app id.
 
-- **Version:** 1.0.4. See [CHANGELOG.md](CHANGELOG.md).
+- **Version:** 1.1.0. See [CHANGELOG.md](CHANGELOG.md).
 - **Also for:** [Android](https://github.com/SallaApp/mobile-push-android-sdk) · [Flutter](https://github.com/SallaApp/mobile-push-sdk/tree/master/flutter) · [React Native](https://github.com/SallaApp/mobile-push-sdk/tree/master/react-native) · [Capacitor](https://github.com/SallaApp/mobile-push-sdk/tree/master/capacitor)
 
 **Contents:** [Requirements](#requirements) · [Installation](#installation) · [Platform setup](#platform-setup) · [Quick start](#quick-start) · [Usage](#usage) · [Other push SDKs](#sallapush-and-other-push-sdks) · [Example app](#example-app) · [Troubleshooting](#troubleshooting) · [Support](#support) · [Contributing](#contributing) · [License](#license)
@@ -32,7 +32,7 @@ Create your Notification Service Extension target first ([Platform setup, step 2
 
 1. In Xcode, choose **File → Add Package Dependencies…** and enter
    `https://github.com/SallaApp/mobile-push-ios-sdk.git`.
-2. Set the dependency rule to **Exact Version** `1.0.4`.
+2. Set the dependency rule to **Exact Version** `1.1.0`.
 3. Add the `SallaPush` library to your app target, and `SallaPushExtension` (never `SallaPush`) to your extension.
 
 In a `Package.swift`, add the package, then `.product(name: "SallaPush", package: "mobile-push-ios-sdk")` to your app
@@ -40,7 +40,7 @@ target and `SallaPushExtension` to your extension target:
 
 <!-- unchecked: a SwiftPM manifest excerpt; the example project uses the package from this folder -->
 ```swift
-.package(url: "https://github.com/SallaApp/mobile-push-ios-sdk.git", exact: "1.0.4"),
+.package(url: "https://github.com/SallaApp/mobile-push-ios-sdk.git", exact: "1.1.0"),
 ```
 
 ### CocoaPods
@@ -50,13 +50,13 @@ and it isn't in the public specs repository. CocoaPods fetches them over HTTPS, 
 
 ```ruby
 target 'YourApp' do
-  pod 'SallaPushCore', :git => 'https://github.com/SallaApp/mobile-push-ios-sdk.git', :tag => '1.0.4'
-  pod 'SallaPush', :git => 'https://github.com/SallaApp/mobile-push-ios-sdk.git', :tag => '1.0.4'
+  pod 'SallaPushCore', :git => 'https://github.com/SallaApp/mobile-push-ios-sdk.git', :tag => '1.1.0'
+  pod 'SallaPush', :git => 'https://github.com/SallaApp/mobile-push-ios-sdk.git', :tag => '1.1.0'
 end
 
 target 'YourNotificationServiceExtension' do
-  pod 'SallaPushCore', :git => 'https://github.com/SallaApp/mobile-push-ios-sdk.git', :tag => '1.0.4'
-  pod 'SallaPushExtension', :git => 'https://github.com/SallaApp/mobile-push-ios-sdk.git', :tag => '1.0.4'
+  pod 'SallaPushCore', :git => 'https://github.com/SallaApp/mobile-push-ios-sdk.git', :tag => '1.1.0'
+  pod 'SallaPushExtension', :git => 'https://github.com/SallaApp/mobile-push-ios-sdk.git', :tag => '1.1.0'
 end
 ```
 

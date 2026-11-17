@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'SallaPushExtension'
-  s.version          = '1.0.4'
+  s.version          = '1.1.0'
   s.summary          = 'SallaPush for the Notification Service Extension.'
   s.description      = 'Displays SallaPush notifications with their attachments and reports their received events from a Notification Service Extension.'
   s.homepage         = 'https://github.com/SallaApp/mobile-push-ios-sdk'
